@@ -1,5 +1,6 @@
 //main.cpp
 #include "Ship.h"
+#include "game.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
@@ -10,16 +11,40 @@ sf::Texture spritesheet;
 sf::Sprite invader;
 std::vector<Ship*> ships;
 
+Player* player = nullptr;
+
+void Reset() {
+    // Reset code to go here
+}
+
 void Load() {
     if (!spritesheet.loadFromFile("res/img/invaders_sheet.png")) {
         cerr << "Failed to load spritesheet!" << std::endl;
     }
-    Invader* inv = new Invader(sf::IntRect(Vector2i(0, 0), Vector2i(32, 32)), { 100,100 } );
-    Invader* inv2 = new Invader(sf::IntRect(Vector2i(32, 0), Vector2i(32, 32)), { 132,100 });
-    Invader* inv3 = new Invader(sf::IntRect(Vector2i(64, 0), Vector2i(32, 32)), { 68,100 });
-    ships.push_back(inv);
-    ships.push_back(inv2);
-    ships.push_back(inv3);
+
+    Bullet::Init();
+
+    float totalWidth = invaders_columns * invaderSize + (invaders_columns - 1) * (invaderSize - invaderSize);
+    
+    float startX = (gameWidth - totalWidth) / 2.0f;
+
+    float startY = 100.0f;
+
+    for (int r = 0; r < invaders_rows; ++r) {
+        auto rect = IntRect(Vector2i(0, 0), Vector2i(32, 32));
+        for (int c = 0; c < invaders_columns; ++c) {
+            float xPos = startX + c * (invaderSize + padding);
+            float yPos = startY + r * (invaderSize + padding);
+
+            Invader* inv = new Invader(rect, sf::Vector2f(xPos, yPos));
+            inv->direction = true;
+            inv->speed = 75.f;
+            ships.push_back(inv);
+        }
+    }
+
+    player = new Player();
+    ships.push_back(player);
 }
 
 void Update(RenderWindow& window){
@@ -35,8 +60,10 @@ void Update(RenderWindow& window){
 
     // Update all ships
     for (auto& s : ships) {
-        s->Update(dt); // Call updatae function for each ship in ships vector
+        s->Update(dt); // Call update function for each ship in ships vector
     }
+
+    Bullet::Update(dt);
 }
 
 void Render(RenderWindow& window) {
@@ -44,10 +71,11 @@ void Render(RenderWindow& window) {
     for (const auto& s : ships) {
         window.draw(*s);
     }
+    Bullet::Render(window);
 }
 
 int main() {
-    RenderWindow window(sf::VideoMode({ 200, 200 }), "Working");
+    RenderWindow window(sf::VideoMode({ gameWidth, gameHeight }), "Working");
     Load();
 
     while (window.isOpen()) {
