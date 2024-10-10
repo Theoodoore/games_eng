@@ -55,7 +55,7 @@ void Bullet::_Update(const float& dt) {
 				//warp bullet off-screen
 				setPosition(Vector2f(-100, -100));
 				return;
-				}
+			}
 		}
 	}
 }
