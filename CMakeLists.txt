@@ -28,11 +28,17 @@ add_executable(PRACTICAL_1 ${SOURCES})
 target_include_directories(PRACTICAL_1 PRIVATE ${SFML_INCS})
 target_link_libraries(PRACTICAL_1 sfml-graphics)
 
-## Space invaders
+#### Space invaders ####
 file(GLOB_RECURSE SOURCES 2_invaders/*.cpp 2_invaders/*.h)
 add_executable(2_INVADERS ${SOURCES} )
 target_include_directories(2_INVADERS SYSTEM PRIVATE ${SFML_INCS})
 target_link_libraries(2_INVADERS sfml-graphics)
+
+#### Pacman ECM ####
+file(GLOB_RECURSE SOURCE_FILES lib_ecm/*.cpp lib_ecm/*.h)
+add_library(lib_ecm STATIC ${SOURCE_FILES})
+target_include_directories(lib_ecm INTERFACE "${CMAKE_SOURCE_DIR}/lib_ecm" )
+target_link_libraries(lib_ecm PRIVATE lib_maths)
 
 set_target_properties(2_INVADERS 
     PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY
